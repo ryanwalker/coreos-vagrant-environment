@@ -29,16 +29,14 @@ Vagrant.configure("2") do |config|
     v.functional_vboxsf     = false
   end
 
-  config.vm.define vm_name = 'coreos' do |coreos|
+  config.vm.define 'coreos' do |coreos|
     coreos.vm.box = "coreos-%s" % $update_channel
     coreos.vm.box_version = ">= 308.0.1"
     coreos.vm.box_url = "http://%s.release.core-os.net/amd64-usr/current/coreos_production_vagrant.json" % $update_channel
 
-    coreos.vm.hostname = vm_name
-
-    coreos.vm.network "forwarded_port", guest: 49153, host: 5555
-    coreos.vm.network "forwarded_port", guest: 2375, host: 2375
-    coreos.vm.network "forwarded_port", guest: 4001, host: 4001
+    config.vm.network "forwarded_port", guest: 5000, host: $expose_docker_tcp, auto_correct: true
+    config.vm.network "forwarded_port", guest: 4001, host: $expose_etcd_tcp, auto_correct: true
+    config.vm.network "forwarded_port", guest: 8091, host: $expose_fleet_tcp, auto_correct: true
 
     coreos.vm.provider :virtualbox do |vb|
       vb.gui = $vm_gui

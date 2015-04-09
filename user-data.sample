@@ -9,6 +9,7 @@ coreos:
     peer-addr: $public_ipv4:7001
   fleet:
     public-ip: $public_ipv4
+    metadata: vpc=5d4e3f38
   flannel:
     interface: $public_ipv4
   units:
@@ -22,7 +23,7 @@ coreos:
       - name: 30-ListenStream.conf
         content: |
           [Socket]
-          ListenStream=49153
+          ListenStream=8091
     - name: update-fleet-metadata.service
     - name: docker-tcp.socket
       command: start
@@ -32,7 +33,7 @@ coreos:
         Description=Docker Socket for the API
 
         [Socket]
-        ListenStream=2375
+        ListenStream=5000
         BindIPv6Only=both
         Service=docker.service
 
@@ -47,3 +48,11 @@ coreos:
         [Service]
         Type=oneshot
         ExecStart=/usr/bin/systemctl enable docker-tcp.socket
+write_files:
+    - path: /home/core/.dockercfg
+      owner: core:core
+      permissions: 0644
+      content: |
+        # Place your ~/.dockercfg here. It is created on you local computer when you do docker login
+        # It will look something like this:
+        # {"https://index.docker.io/v1/": {"auth": "auth_token_here","email":"your_dockerhub_email_here"}}
